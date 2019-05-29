@@ -77,6 +77,9 @@ export default class ImageViewer extends React.Component<Props, State> {
   private midpointX: number = 0;
   private midpointY: number = 0;
 
+  private lastValidPositionX = 0;
+  private lastValidPositionY = 0;
+
   public componentWillMount() {
     this.imagePanResponder = PanResponder.create({
       // 要求成为响应者：
@@ -456,7 +459,13 @@ export default class ImageViewer extends React.Component<Props, State> {
 
               this.animatedPositionX.setValue(this.positionX);
               this.animatedPositionY.setValue(this.positionY);
+
+              if (this.scale >= (this.props.minScale || 0) && this.scale <= (this.props.maxScale || 0)) {
+                this.lastValidPositionX = this.positionX;
+                this.lastValidPositionY = this.positionY;
+              }
             }
+
             this.zoomLastDistance = this.zoomCurrentDistance;
           }
         }
@@ -533,14 +542,38 @@ export default class ImageViewer extends React.Component<Props, State> {
       }).start();
     } else if (this.scale < (this.props.minScale || 0)) {
       // If the current scale is zoomed out too much, bounce back to the minScale
-      this.scale = this.props.minScale || 1;
+      this.positionX = this.lastValidPositionX;
+      this.scale = this.props.maxScale || 0;
+      Animated.timing(this.animatedPositionX, {
+        toValue: this.positionX,
+        duration: 100
+      }).start();
+
+      this.positionY = this.lastValidPositionY;
+      Animated.timing(this.animatedPositionY, {
+        toValue: this.positionY,
+        duration: 100
+      }).start();
+
       Animated.timing(this.animatedScale, {
         toValue: this.scale,
         duration: 100
       }).start();
     } else if (this.scale > (this.props.maxScale || 0)) {
       // If the current scale is zoomed in too much, bounce back to the maxScale
+      this.positionX = this.lastValidPositionX;
       this.scale = this.props.maxScale || 0;
+      Animated.timing(this.animatedPositionX, {
+        toValue: this.positionX,
+        duration: 100
+      }).start();
+
+      this.positionY = this.lastValidPositionY;
+      Animated.timing(this.animatedPositionY, {
+        toValue: this.positionY,
+        duration: 100
+      }).start();
+
       Animated.timing(this.animatedScale, {
         toValue: this.scale,
         duration: 100
