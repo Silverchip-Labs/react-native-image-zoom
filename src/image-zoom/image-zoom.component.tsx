@@ -425,12 +425,7 @@ export default class ImageViewer extends React.Component<Props, State> {
 
               // var distanceDiff = (_this.zoomCurrentDistance - _this.zoomLastDistance);
               var zoom = this.scale * distanceScale;
-              // if (zoom < (this.props.minScale || 0)) {
-              // zoom = this.props.minScale || 0;
-              // }
-              // if (zoom > (this.props.maxScale || 0)) {
-              // zoom = this.props.maxScale || 0;
-              // }
+
               // 记录之前缩放比例
               // var beforeScale = _this.scale;
               // 开始缩放
