@@ -99,7 +99,7 @@ npm start
 ### Step 2, run demo
 
 ```bash
-cd demo
+cd example
 npm install
 npm start
 ```
