@@ -73,6 +73,9 @@ export default class ImageViewer extends React.Component<Props, State> {
 
   // 是否在左右滑
   private isHorizontalWrap = false;
+  
+  private midpointX: number = 0;
+  private midpointY: number = 0;
 
   public componentWillMount() {
     this.imagePanResponder = PanResponder.create({
