@@ -531,10 +531,15 @@ export default class ImageViewer extends React.Component<Props, State> {
         toValue: this.scale,
         duration: 100
       }).start();
-    }
-
-    if (this.scale > (this.props.maxScale || 0)) {
-      // If the current scale is zoomed in too much, snap back to the maxScale
+    } else if (this.scale < (this.props.minScale || 0)) {
+      // If the current scale is zoomed out too much, bounce back to the minScale
+      this.scale = this.props.minScale || 1;
+      Animated.timing(this.animatedScale, {
+        toValue: this.scale,
+        duration: 100
+      }).start();
+    } else if (this.scale > (this.props.maxScale || 0)) {
+      // If the current scale is zoomed in too much, bounce back to the maxScale
       this.scale = this.props.maxScale || 0;
       Animated.timing(this.animatedScale, {
         toValue: this.scale,
