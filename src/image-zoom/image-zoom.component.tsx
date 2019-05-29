@@ -461,6 +461,7 @@ export default class ImageViewer extends React.Component<Props, State> {
               this.animatedPositionY.setValue(this.positionY);
 
               if (this.scale >= (this.props.minScale || 0) && this.scale <= (this.props.maxScale || 0)) {
+                console.log('valid');
                 this.lastValidPositionX = this.positionX;
                 this.lastValidPositionY = this.positionY;
               }
@@ -538,7 +539,7 @@ export default class ImageViewer extends React.Component<Props, State> {
       this.scale = 1;
       Animated.timing(this.animatedScale, {
         toValue: this.scale,
-        duration: 100
+        duration: 1
       }).start();
     } else if (this.scale < (this.props.minScale || 0)) {
       // If the current scale is zoomed out too much, bounce back to the minScale
@@ -546,18 +547,18 @@ export default class ImageViewer extends React.Component<Props, State> {
       this.scale = this.props.maxScale || 0;
       Animated.timing(this.animatedPositionX, {
         toValue: this.positionX,
-        duration: 100
+        duration: 1
       }).start();
 
       this.positionY = this.lastValidPositionY;
       Animated.timing(this.animatedPositionY, {
         toValue: this.positionY,
-        duration: 100
+        duration: 1
       }).start();
 
       Animated.timing(this.animatedScale, {
         toValue: this.scale,
-        duration: 100
+        duration: 1
       }).start();
     } else if (this.scale > (this.props.maxScale || 0)) {
       // If the current scale is zoomed in too much, bounce back to the maxScale
@@ -565,18 +566,18 @@ export default class ImageViewer extends React.Component<Props, State> {
       this.scale = this.props.maxScale || 0;
       Animated.timing(this.animatedPositionX, {
         toValue: this.positionX,
-        duration: 100
+        duration: 1
       }).start();
 
       this.positionY = this.lastValidPositionY;
       Animated.timing(this.animatedPositionY, {
         toValue: this.positionY,
-        duration: 100
+        duration: 1
       }).start();
 
       Animated.timing(this.animatedScale, {
         toValue: this.scale,
-        duration: 100
+        duration: 1
       }).start();
     }
 
