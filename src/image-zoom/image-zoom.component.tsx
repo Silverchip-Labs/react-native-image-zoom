@@ -363,7 +363,6 @@ export default class ImageViewer extends React.Component<Props, State> {
           if (this.props.pinchToZoom) {
             // console.log('pinchZoom');
 
-            console.log('helooo');
             var midpointX =
               (evt.nativeEvent.changedTouches[0].locationX + evt.nativeEvent.changedTouches[1].locationX) / 2;
             var midpointY =
@@ -426,12 +425,12 @@ export default class ImageViewer extends React.Component<Props, State> {
 
               // var distanceDiff = (_this.zoomCurrentDistance - _this.zoomLastDistance);
               var zoom = this.scale * distanceScale;
-              if (zoom < (this.props.minScale || 0)) {
-                zoom = this.props.minScale || 0;
-              }
-              if (zoom > (this.props.maxScale || 0)) {
-                zoom = this.props.maxScale || 0;
-              }
+              // if (zoom < (this.props.minScale || 0)) {
+              // zoom = this.props.minScale || 0;
+              // }
+              // if (zoom > (this.props.maxScale || 0)) {
+              // zoom = this.props.maxScale || 0;
+              // }
               // 记录之前缩放比例
               // var beforeScale = _this.scale;
               // 开始缩放
@@ -533,6 +532,15 @@ export default class ImageViewer extends React.Component<Props, State> {
     if (this.props.enableCenterFocus && this.scale < 1) {
       // 如果缩放小于1，强制重置为 1
       this.scale = 1;
+      Animated.timing(this.animatedScale, {
+        toValue: this.scale,
+        duration: 100
+      }).start();
+    }
+
+    if (this.scale > (this.props.maxScale || 0)) {
+      // If the current scale is zoomed in too much, snap back to the maxScale
+      this.scale = this.props.maxScale || 0;
       Animated.timing(this.animatedScale, {
         toValue: this.scale,
         duration: 100
