@@ -74,6 +74,9 @@ export default class ImageViewer extends React.Component<Props, State> {
   // 是否在左右滑
   private isHorizontalWrap = false;
 
+  private midpointX: number = 0;
+  private midpointY: number = 0;
+
   public componentWillMount() {
     this.imagePanResponder = PanResponder.create({
       // 要求成为响应者：
@@ -360,8 +363,10 @@ export default class ImageViewer extends React.Component<Props, State> {
           if (this.props.pinchToZoom) {
             // console.log('pinchZoom');
 
-            var midpointX = (evt.nativeEvent.changedTouches[0].locationX + evt.nativeEvent.changedTouches[1].locationX) / 2;
-            var midpointY = (evt.nativeEvent.changedTouches[0].locationY + evt.nativeEvent.changedTouches[1].locationY) / 2;
+            var midpointX =
+              (evt.nativeEvent.changedTouches[0].locationX + evt.nativeEvent.changedTouches[1].locationX) / 2;
+            var midpointY =
+              (evt.nativeEvent.changedTouches[0].locationY + evt.nativeEvent.changedTouches[1].locationY) / 2;
 
             this.midpointX = midpointX;
             this.midpointY = midpointY;
@@ -372,8 +377,7 @@ export default class ImageViewer extends React.Component<Props, State> {
             if (evt.nativeEvent.changedTouches[0].locationX > evt.nativeEvent.changedTouches[1].locationX) {
               minX = evt.nativeEvent.changedTouches[1].pageX;
               maxX = evt.nativeEvent.changedTouches[0].pageX;
-            }
-            else {
+            } else {
               minX = evt.nativeEvent.changedTouches[0].pageX;
               maxX = evt.nativeEvent.changedTouches[1].pageX;
             }
@@ -383,8 +387,7 @@ export default class ImageViewer extends React.Component<Props, State> {
             if (evt.nativeEvent.changedTouches[0].locationY > evt.nativeEvent.changedTouches[1].locationY) {
               minY = evt.nativeEvent.changedTouches[1].pageY;
               maxY = evt.nativeEvent.changedTouches[0].pageY;
-            }
-            else {
+            } else {
               minY = evt.nativeEvent.changedTouches[0].pageY;
               maxY = evt.nativeEvent.changedTouches[1].pageY;
             }
@@ -401,8 +404,8 @@ export default class ImageViewer extends React.Component<Props, State> {
             // console.log('pos x: ' + this.positionX);
             // console.log('pos y: ' + this.positionY);
 
-            let mapCentreX = (this.props.imageWidth / 2) - this.positionX; // This is image coords
-            let mapCentreY = (this.props.imageHeight / 2) - this.positionY; // This is image coords
+            let mapCentreX = this.props.imageWidth / 2 - this.positionX; // This is image coords
+            let mapCentreY = this.props.imageHeight / 2 - this.positionY; // This is image coords
 
             // console.log('-');
             // console.log('map centre x: ' + mapCentreX);
@@ -414,11 +417,9 @@ export default class ImageViewer extends React.Component<Props, State> {
 
             this.zoomCurrentDistance = Number(diagonalDistance.toFixed(1));
             if (this.zoomLastDistance !== null) {
-
               var distanceScale = this.zoomCurrentDistance / this.zoomLastDistance;
 
               // var distanceDiff = (_this.zoomCurrentDistance - _this.zoomLastDistance);
-
 
               // -- Zooming
 
@@ -435,7 +436,6 @@ export default class ImageViewer extends React.Component<Props, State> {
               // 开始缩放
               this.scale = zoom;
               this.animatedScale.setValue(this.scale);
-
 
               // -- Panning
               // console.log('pinch changed');
@@ -456,9 +456,8 @@ export default class ImageViewer extends React.Component<Props, State> {
               // console.log('scaleOffsetXDifference ' + scaleOffsetXDifference);
               // console.log('scaleOffsetYDifference ' + scaleOffsetYDifference);
 
-
-              this.positionX -= (scaleOffsetXDifference);
-              this.positionY -= (scaleOffsetYDifference);
+              this.positionX -= scaleOffsetXDifference;
+              this.positionY -= scaleOffsetYDifference;
 
               this.animatedPositionX.setValue(this.positionX);
               this.animatedPositionY.setValue(this.positionY);
