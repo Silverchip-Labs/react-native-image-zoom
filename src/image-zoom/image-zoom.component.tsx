@@ -363,6 +363,7 @@ export default class ImageViewer extends React.Component<Props, State> {
           if (this.props.pinchToZoom) {
             // console.log('pinchZoom');
 
+            console.log('helooo');
             var midpointX =
               (evt.nativeEvent.changedTouches[0].locationX + evt.nativeEvent.changedTouches[1].locationX) / 2;
             var midpointY =
