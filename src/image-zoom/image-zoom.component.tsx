@@ -358,13 +358,22 @@ export default class ImageViewer extends React.Component<Props, State> {
           }
 
           if (this.props.pinchToZoom) {
+            // console.log('pinchZoom');
+
+            var midpointX = (evt.nativeEvent.changedTouches[0].locationX + evt.nativeEvent.changedTouches[1].locationX) / 2;
+            var midpointY = (evt.nativeEvent.changedTouches[0].locationY + evt.nativeEvent.changedTouches[1].locationY) / 2;
+
+            this.midpointX = midpointX;
+            this.midpointY = midpointY;
+
             // 找最小的 x 和最大的 x
             let minX: number;
             let maxX: number;
             if (evt.nativeEvent.changedTouches[0].locationX > evt.nativeEvent.changedTouches[1].locationX) {
               minX = evt.nativeEvent.changedTouches[1].pageX;
               maxX = evt.nativeEvent.changedTouches[0].pageX;
-            } else {
+            }
+            else {
               minX = evt.nativeEvent.changedTouches[0].pageX;
               maxX = evt.nativeEvent.changedTouches[1].pageX;
             }
@@ -374,41 +383,83 @@ export default class ImageViewer extends React.Component<Props, State> {
             if (evt.nativeEvent.changedTouches[0].locationY > evt.nativeEvent.changedTouches[1].locationY) {
               minY = evt.nativeEvent.changedTouches[1].pageY;
               maxY = evt.nativeEvent.changedTouches[0].pageY;
-            } else {
+            }
+            else {
               minY = evt.nativeEvent.changedTouches[0].pageY;
               maxY = evt.nativeEvent.changedTouches[1].pageY;
             }
 
-            const widthDistance = maxX - minX;
-            const heightDistance = maxY - minY;
-            const diagonalDistance = Math.sqrt(widthDistance * widthDistance + heightDistance * heightDistance);
+            let widthDistance = maxX - minX;
+            let heightDistance = maxY - minY;
+
+            // var midpointX = (evt.nativeEvent.changedTouches[0].locationX + evt.nativeEvent.changedTouches[1].locationX) / 2;
+            // var midpointY = (evt.nativeEvent.changedTouches[0].locationY + evt.nativeEvent.changedTouches[1].locationY) / 2;
+
+            // console.log('midpoint x: ' + this.midpointX);
+            // console.log('midpoint y: ' + this.midpointY);
+            // console.log('-');
+            // console.log('pos x: ' + this.positionX);
+            // console.log('pos y: ' + this.positionY);
+
+            let mapCentreX = (this.props.imageWidth / 2) - this.positionX; // This is image coords
+            let mapCentreY = (this.props.imageHeight / 2) - this.positionY; // This is image coords
+
+            // console.log('-');
+            // console.log('map centre x: ' + mapCentreX);
+            // console.log('map centre y: ' + mapCentreY);
+
+            // console.log('diagonalDistanceCenterpoints: ' + diagonalDistanceCenterpoints)
+
+            var diagonalDistance = Math.sqrt(widthDistance * widthDistance + heightDistance * heightDistance);
+
             this.zoomCurrentDistance = Number(diagonalDistance.toFixed(1));
-
             if (this.zoomLastDistance !== null) {
-              const distanceDiff = (this.zoomCurrentDistance - this.zoomLastDistance) / 200;
-              let zoom = this.scale + distanceDiff;
 
-              if (zoom < (this!.props!.minScale || 0)) {
-                zoom = this!.props!.minScale || 0;
-              }
-              if (zoom > (this!.props!.maxScale || 0)) {
-                zoom = this!.props!.maxScale || 0;
-              }
+              var distanceScale = this.zoomCurrentDistance / this.zoomLastDistance;
 
+              // var distanceDiff = (_this.zoomCurrentDistance - _this.zoomLastDistance);
+
+
+              // -- Zooming
+
+              // var distanceDiff = (_this.zoomCurrentDistance - _this.zoomLastDistance);
+              var zoom = this.scale * distanceScale;
+              if (zoom < (this.props.minScale || 0)) {
+                zoom = this.props.minScale || 0;
+              }
+              if (zoom > (this.props.maxScale || 0)) {
+                zoom = this.props.maxScale || 0;
+              }
               // 记录之前缩放比例
-              const beforeScale = this.scale;
-
+              // var beforeScale = _this.scale;
               // 开始缩放
               this.scale = zoom;
               this.animatedScale.setValue(this.scale);
 
-              // 图片要慢慢往两个手指的中心点移动
-              // 缩放 diff
-              const diffScale = this.scale - beforeScale;
-              // 找到两手中心点距离页面中心的位移
-              // 移动位置
-              this.positionX -= (this.centerDiffX * diffScale) / this.scale;
-              this.positionY -= (this.centerDiffY * diffScale) / this.scale;
+
+              // -- Panning
+              // console.log('pinch changed');
+              // console.log('distanceScale: ' + distanceScale);
+
+              var offsetX = this.midpointX - mapCentreX;
+              var offsetY = this.midpointY - mapCentreY;
+              // console.log('offsetX ' + offsetX);
+              // console.log('offsetY ' + offsetY);
+
+              var scaleOffsetX = offsetX * distanceScale;
+              var scaleOffsetY = offsetY * distanceScale;
+              // console.log('scaleOffsetX ' + scaleOffsetX);
+              // console.log('scaleOffsetY ' + scaleOffsetY);
+
+              var scaleOffsetXDifference = scaleOffsetX - offsetX;
+              var scaleOffsetYDifference = scaleOffsetY - offsetY;
+              // console.log('scaleOffsetXDifference ' + scaleOffsetXDifference);
+              // console.log('scaleOffsetYDifference ' + scaleOffsetYDifference);
+
+
+              this.positionX -= (scaleOffsetXDifference);
+              this.positionY -= (scaleOffsetYDifference);
+
               this.animatedPositionX.setValue(this.positionX);
               this.animatedPositionY.setValue(this.positionY);
             }
