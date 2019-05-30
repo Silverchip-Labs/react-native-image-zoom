@@ -4,8 +4,8 @@ import {
   LayoutChangeEvent,
   PanResponder,
   PanResponderInstance,
-  Platform,
-  PlatformOSType,
+  // Platform,
+  // PlatformOSType,
   StyleSheet,
   View
 } from 'react-native';
@@ -277,22 +277,6 @@ export default class ImageViewer extends React.Component<Props, State> {
                 // 产生位移
                 this.positionX += diffX / this.scale;
 
-                // 但是横向不能出现黑边
-                // 横向能容忍的绝对值
-                const horizontalMax = (this.props.imageWidth * this.scale - this.props.cropWidth) / 2 / this.scale;
-                if (this.positionX < -horizontalMax) {
-                  // 超越了左边临界点，还在继续向左移动
-                  this.positionX = -horizontalMax;
-
-                  // 让其产生细微位移，偏离轨道
-                  this.horizontalWholeOuterCounter += -1 / 1e10;
-                } else if (this.positionX > horizontalMax) {
-                  // 超越了右侧临界点，还在继续向右移动
-                  this.positionX = horizontalMax;
-
-                  // 让其产生细微位移，偏离轨道
-                  this.horizontalWholeOuterCounter += 1 / 1e10;
-                }
                 this.animatedPositionX.setValue(this.positionX);
               } else {
                 // 不能横向拖拽，全部算做溢出偏移量
@@ -318,40 +302,6 @@ export default class ImageViewer extends React.Component<Props, State> {
             if (this.props.imageHeight * this.scale > this.props.cropHeight) {
               this.positionY += diffY / this.scale;
               this.animatedPositionY.setValue(this.positionY);
-
-              // 如果图片上边缘脱离屏幕上边缘，则进入 swipeDown 动作
-              // if (
-              //   (this.props.imageHeight / 2 - this.positionY) * this.scale <
-              //   this.props.cropHeight / 2
-              // ) {
-              //   if (this.props.enableSwipeDown) {
-              //     this.swipeDownOffset += diffY
-
-              //     // 只要滑动溢出量不小于 0，就可以拖动
-              //     if (this.swipeDownOffset > 0) {
-              //       this.positionY += diffY / this.scale
-              //       this.animatedPositionY.setValue(this.positionY)
-
-              //       // 越到下方，缩放越小
-              //       this.scale = this.scale - diffY / 1000
-              //       this.animatedScale.setValue(this.scale)
-              //     }
-              //   }
-              // }
-            } else {
-              // swipeDown 不允许在已经有横向偏移量时触发
-              // if (this.props.enableSwipeDown && !this.isHorizontalWrap) {
-              //   // 图片高度小于盒子高度，只能向下拖拽，而且一定是 swipeDown 动作
-              //   this.swipeDownOffset += diffY;
-              //   // 只要滑动溢出量不小于 0，就可以拖动
-              //   if (this.swipeDownOffset > 0) {
-              //     this.positionY += diffY / this.scale;
-              //     this.animatedPositionY.setValue(this.positionY);
-              //     // 越到下方，缩放越小
-              //     this.scale = this.scale - diffY / 1000;
-              //     this.animatedScale.setValue(this.scale);
-              //   }
-              // }
             }
           }
         } else {
@@ -394,23 +344,8 @@ export default class ImageViewer extends React.Component<Props, State> {
             let widthDistance = maxX - minX;
             let heightDistance = maxY - minY;
 
-            // var midpointX = (evt.nativeEvent.changedTouches[0].locationX + evt.nativeEvent.changedTouches[1].locationX) / 2;
-            // var midpointY = (evt.nativeEvent.changedTouches[0].locationY + evt.nativeEvent.changedTouches[1].locationY) / 2;
-
-            // console.log('midpoint x: ' + this.midpointX);
-            // console.log('midpoint y: ' + this.midpointY);
-            // console.log('-');
-            // console.log('pos x: ' + this.positionX);
-            // console.log('pos y: ' + this.positionY);
-
             let mapCentreX = this.props.imageWidth / 2 - this.positionX; // This is image coords
             let mapCentreY = this.props.imageHeight / 2 - this.positionY; // This is image coords
-
-            // console.log('-');
-            // console.log('map centre x: ' + mapCentreX);
-            // console.log('map centre y: ' + mapCentreY);
-
-            // console.log('diagonalDistanceCenterpoints: ' + diagonalDistanceCenterpoints)
 
             var diagonalDistance = Math.sqrt(widthDistance * widthDistance + heightDistance * heightDistance);
 
@@ -418,11 +353,7 @@ export default class ImageViewer extends React.Component<Props, State> {
             if (this.zoomLastDistance !== null) {
               var distanceScale = this.zoomCurrentDistance / this.zoomLastDistance;
 
-              // var distanceDiff = (_this.zoomCurrentDistance - _this.zoomLastDistance);
-
               // -- Zooming
-
-              // var distanceDiff = (_this.zoomCurrentDistance - _this.zoomLastDistance);
               var zoom = this.scale * distanceScale;
 
               // 记录之前缩放比例
@@ -432,23 +363,14 @@ export default class ImageViewer extends React.Component<Props, State> {
               this.animatedScale.setValue(this.scale);
 
               // -- Panning
-              // console.log('pinch changed');
-              // console.log('distanceScale: ' + distanceScale);
-
               var offsetX = this.midpointX - mapCentreX;
               var offsetY = this.midpointY - mapCentreY;
-              // console.log('offsetX ' + offsetX);
-              // console.log('offsetY ' + offsetY);
 
               var scaleOffsetX = offsetX * distanceScale;
               var scaleOffsetY = offsetY * distanceScale;
-              // console.log('scaleOffsetX ' + scaleOffsetX);
-              // console.log('scaleOffsetY ' + scaleOffsetY);
 
               var scaleOffsetXDifference = scaleOffsetX - offsetX;
               var scaleOffsetYDifference = scaleOffsetY - offsetY;
-              // console.log('scaleOffsetXDifference ' + scaleOffsetXDifference);
-              // console.log('scaleOffsetYDifference ' + scaleOffsetYDifference);
 
               this.positionX -= scaleOffsetXDifference;
               this.positionY -= scaleOffsetYDifference;
