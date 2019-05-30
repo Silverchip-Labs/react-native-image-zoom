@@ -364,8 +364,6 @@ export default class ImageViewer extends React.Component<Props, State> {
           }
 
           if (this.props.pinchToZoom) {
-            // console.log('pinchZoom');
-
             var midpointX =
               (evt.nativeEvent.changedTouches[0].locationX + evt.nativeEvent.changedTouches[1].locationX) / 2;
             var midpointY =
@@ -459,12 +457,10 @@ export default class ImageViewer extends React.Component<Props, State> {
 
               this.animatedPositionX.setValue(this.positionX);
               this.animatedPositionY.setValue(this.positionY);
-
-              if (this.scale >= (this.props.minScale || 0) && this.scale <= (this.props.maxScale || 0)) {
-                console.log('valid');
-                this.lastValidPositionX = this.positionX;
-                this.lastValidPositionY = this.positionY;
-              }
+            }
+            if (this.scale >= (this.props.minScale || 0) && this.scale <= (this.props.maxScale || 0)) {
+              this.lastValidPositionX = this.positionX;
+              this.lastValidPositionY = this.positionY;
             }
 
             this.zoomLastDistance = this.zoomCurrentDistance;
