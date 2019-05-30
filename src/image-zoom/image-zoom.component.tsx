@@ -458,6 +458,7 @@ export default class ImageViewer extends React.Component<Props, State> {
               this.animatedPositionX.setValue(this.positionX);
               this.animatedPositionY.setValue(this.positionY);
             }
+
             if (this.scale >= (this.props.minScale || 0) && this.scale <= (this.props.maxScale || 0)) {
               this.lastValidPositionX = this.positionX;
               this.lastValidPositionY = this.positionY;
