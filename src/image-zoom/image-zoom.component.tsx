@@ -222,12 +222,12 @@ export default class ImageViewer extends React.Component<Props, State> {
             // 处理左右滑，如果正在 swipeDown，左右滑失效
             if (this.swipeDownOffset === 0) {
               if (Math.abs(diffX) > Math.abs(diffY)) {
-                this.isHorizontalWrap = true;
+                // this.isHorizontalWrap = true;
               }
 
               // diffX > 0 表示手往右滑，图往左移动，反之同理
               // horizontalWholeOuterCounter > 0 表示溢出在左侧，反之在右侧，绝对值越大溢出越多
-              if (this.props.imageWidth * this.scale > this.props.cropWidth) {
+              if (true) {
                 // 如果图片宽度大图盒子宽度， 可以横向拖拽
                 // 没有溢出偏移量或者这次位移完全收回了偏移量才能拖拽
                 if (this.horizontalWholeOuterCounter > 0) {
@@ -279,20 +279,20 @@ export default class ImageViewer extends React.Component<Props, State> {
 
                 // 但是横向不能出现黑边
                 // 横向能容忍的绝对值
-                const horizontalMax = (this.props.imageWidth * this.scale - this.props.cropWidth) / 2 / this.scale;
-                if (this.positionX < -horizontalMax) {
-                  // 超越了左边临界点，还在继续向左移动
-                  this.positionX = -horizontalMax;
+                // const horizontalMax = (this.props.imageWidth * this.scale - this.props.cropWidth) / 2 / this.scale;
+                // if (this.positionX < -horizontalMax) {
+                //   // 超越了左边临界点，还在继续向左移动
+                //   this.positionX = -horizontalMax;
 
-                  // 让其产生细微位移，偏离轨道
-                  this.horizontalWholeOuterCounter += -1 / 1e10;
-                } else if (this.positionX > horizontalMax) {
-                  // 超越了右侧临界点，还在继续向右移动
-                  this.positionX = horizontalMax;
+                //   // 让其产生细微位移，偏离轨道
+                //   this.horizontalWholeOuterCounter += -1 / 1e10;
+                // } else if (this.positionX > horizontalMax) {
+                //   // 超越了右侧临界点，还在继续向右移动
+                //   this.positionX = horizontalMax;
 
-                  // 让其产生细微位移，偏离轨道
-                  this.horizontalWholeOuterCounter += 1 / 1e10;
-                }
+                //   // 让其产生细微位移，偏离轨道
+                //   this.horizontalWholeOuterCounter += 1 / 1e10;
+                // }
                 this.animatedPositionX.setValue(this.positionX);
               } else {
                 // 不能横向拖拽，全部算做溢出偏移量
@@ -315,7 +315,7 @@ export default class ImageViewer extends React.Component<Props, State> {
             }
 
             // 如果图片高度大于盒子高度， 可以纵向弹性拖拽
-            if (this.props.imageHeight * this.scale > this.props.cropHeight) {
+            if (true) {
               this.positionY += diffY / this.scale;
               this.animatedPositionY.setValue(this.positionY);
 
@@ -581,53 +581,53 @@ export default class ImageViewer extends React.Component<Props, State> {
       }).start();
     }
 
-    if (this.props.imageWidth * this.scale <= this.props.cropWidth) {
-      // 如果图片宽度小于盒子宽度，横向位置重置
-      this.positionX = 0;
-      Animated.timing(this.animatedPositionX, {
-        toValue: this.positionX,
-        duration: 100
-      }).start();
-    }
+    // if (this.props.imageWidth * this.scale <= this.props.cropWidth) {
+    //   // 如果图片宽度小于盒子宽度，横向位置重置
+    //   this.positionX = 0;
+    //   Animated.timing(this.animatedPositionX, {
+    //     toValue: this.positionX,
+    //     duration: 100
+    //   }).start();
+    // }
 
-    if (this.props.imageHeight * this.scale <= this.props.cropHeight) {
-      // 如果图片高度小于盒子高度，纵向位置重置
-      this.positionY = 0;
-      Animated.timing(this.animatedPositionY, {
-        toValue: this.positionY,
-        duration: 100
-      }).start();
-    }
+    // if (this.props.imageHeight * this.scale <= this.props.cropHeight) {
+    //   // 如果图片高度小于盒子高度，纵向位置重置
+    //   this.positionY = 0;
+    //   Animated.timing(this.animatedPositionY, {
+    //     toValue: this.positionY,
+    //     duration: 100
+    //   }).start();
+    // }
 
     // 横向肯定不会超出范围，由拖拽时控制
     // 如果图片高度大于盒子高度，纵向不能出现黑边
-    if (this.props.imageHeight * this.scale > this.props.cropHeight) {
-      // 纵向能容忍的绝对值
-      const verticalMax = (this.props.imageHeight * this.scale - this.props.cropHeight) / 2 / this.scale;
-      if (this.positionY < -verticalMax) {
-        this.positionY = -verticalMax;
-      } else if (this.positionY > verticalMax) {
-        this.positionY = verticalMax;
-      }
-      Animated.timing(this.animatedPositionY, {
-        toValue: this.positionY,
-        duration: 100
-      }).start();
-    }
+    // if (this.props.imageHeight * this.scale > this.props.cropHeight) {
+    //   // 纵向能容忍的绝对值
+    //   const verticalMax = (this.props.imageHeight * this.scale - this.props.cropHeight) / 2 / this.scale;
+    //   if (this.positionY < -verticalMax) {
+    //     this.positionY = -verticalMax;
+    //   } else if (this.positionY > verticalMax) {
+    //     this.positionY = verticalMax;
+    //   }
+    //   Animated.timing(this.animatedPositionY, {
+    //     toValue: this.positionY,
+    //     duration: 1
+    //   }).start();
+    // }
 
-    if (this.props.imageWidth * this.scale > this.props.cropWidth) {
-      // 纵向能容忍的绝对值
-      const horizontalMax = (this.props.imageWidth * this.scale - this.props.cropWidth) / 2 / this.scale;
-      if (this.positionX < -horizontalMax) {
-        this.positionX = -horizontalMax;
-      } else if (this.positionX > horizontalMax) {
-        this.positionX = horizontalMax;
-      }
-      Animated.timing(this.animatedPositionX, {
-        toValue: this.positionX,
-        duration: 100
-      }).start();
-    }
+    // if (this.props.imageWidth * this.scale > this.props.cropWidth) {
+    //   // 纵向能容忍的绝对值
+    //   const horizontalMax = (this.props.imageWidth * this.scale - this.props.cropWidth) / 2 / this.scale;
+    //   if (this.positionX < -horizontalMax) {
+    //     this.positionX = -horizontalMax;
+    //   } else if (this.positionX > horizontalMax) {
+    //     this.positionX = horizontalMax;
+    //   }
+    //   Animated.timing(this.animatedPositionX, {
+    //     toValue: this.positionX,
+    //     duration: 1
+    //   }).start();
+    // }
 
     // 拖拽正常结束后,如果没有缩放,直接回到0,0点
     if (this.props.enableCenterFocus && this.scale === 1) {
@@ -635,11 +635,11 @@ export default class ImageViewer extends React.Component<Props, State> {
       this.positionY = 0;
       Animated.timing(this.animatedPositionX, {
         toValue: this.positionX,
-        duration: 100
+        duration: 1
       }).start();
       Animated.timing(this.animatedPositionY, {
         toValue: this.positionY,
-        duration: 100
+        duration: 1
       }).start();
     }
 
