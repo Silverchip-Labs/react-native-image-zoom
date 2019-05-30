@@ -221,9 +221,9 @@ export default class ImageViewer extends React.Component<Props, State> {
           if (this.props.panToMove) {
             // 处理左右滑，如果正在 swipeDown，左右滑失效
             if (this.swipeDownOffset === 0) {
-              if (Math.abs(diffX) > Math.abs(diffY)) {
-                this.isHorizontalWrap = true;
-              }
+              // if (Math.abs(diffX) > Math.abs(diffY)) {
+              //   this.isHorizontalWrap = true;
+              // }
 
               // diffX > 0 表示手往右滑，图往左移动，反之同理
               // horizontalWholeOuterCounter > 0 表示溢出在左侧，反之在右侧，绝对值越大溢出越多
@@ -340,20 +340,18 @@ export default class ImageViewer extends React.Component<Props, State> {
               // }
             } else {
               // swipeDown 不允许在已经有横向偏移量时触发
-              if (this.props.enableSwipeDown && !this.isHorizontalWrap) {
-                // 图片高度小于盒子高度，只能向下拖拽，而且一定是 swipeDown 动作
-                this.swipeDownOffset += diffY;
-
-                // 只要滑动溢出量不小于 0，就可以拖动
-                if (this.swipeDownOffset > 0) {
-                  this.positionY += diffY / this.scale;
-                  this.animatedPositionY.setValue(this.positionY);
-
-                  // 越到下方，缩放越小
-                  this.scale = this.scale - diffY / 1000;
-                  this.animatedScale.setValue(this.scale);
-                }
-              }
+              // if (this.props.enableSwipeDown && !this.isHorizontalWrap) {
+              //   // 图片高度小于盒子高度，只能向下拖拽，而且一定是 swipeDown 动作
+              //   this.swipeDownOffset += diffY;
+              //   // 只要滑动溢出量不小于 0，就可以拖动
+              //   if (this.swipeDownOffset > 0) {
+              //     this.positionY += diffY / this.scale;
+              //     this.animatedPositionY.setValue(this.positionY);
+              //     // 越到下方，缩放越小
+              //     this.scale = this.scale - diffY / 1000;
+              //     this.animatedScale.setValue(this.scale);
+              //   }
+              // }
             }
           }
         } else {
