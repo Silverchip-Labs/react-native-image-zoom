@@ -544,7 +544,7 @@ export default class ImageViewer extends React.Component<Props, State> {
     } else if (this.scale < (this.props.minScale || 0)) {
       // If the current scale is zoomed out too much, bounce back to the minScale
       this.positionX = this.lastValidPositionX;
-      this.scale = this.props.maxScale || 0;
+      this.scale = this.props.minScale || 0;
       Animated.timing(this.animatedPositionX, {
         toValue: this.positionX,
         duration: 1

@@ -11,6 +11,7 @@ export default class App extends React.Component {
         imageWidth={Dimensions.get('window').width}
         imageHeight={Dimensions.get('window').height}
         enableSwipeDown={true}
+        enableCenterFocus={false}
       >
         <Image
           enableHorizontalBounce={true}
