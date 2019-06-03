@@ -80,6 +80,9 @@ export default class ImageViewer extends React.Component<Props, State> {
   private lastValidPositionX = 0;
   private lastValidPositionY = 0;
 
+  // Keeps max number of contact point in 1 gesture
+  private maxContactPoints = 0;
+
   public componentWillMount() {
     this.imagePanResponder = PanResponder.create({
       // 要求成为响应者：
@@ -189,6 +192,11 @@ export default class ImageViewer extends React.Component<Props, State> {
         }
       },
       onPanResponderMove: (evt, gestureState) => {
+        const contactPointsCount = evt.nativeEvent.touches.length;
+        if (contactPointsCount > this.maxContactPoints) {
+          this.maxContactPoints = contactPointsCount;
+        }
+
         if (this.isDoubleClick) {
           // 有时双击会被当做位移，这里屏蔽掉
           return;
@@ -411,7 +419,8 @@ export default class ImageViewer extends React.Component<Props, State> {
         const moveDistance = Math.sqrt(gestureState.dx * gestureState.dx + gestureState.dy * gestureState.dy);
         const { locationX, locationY, pageX, pageY } = evt.nativeEvent;
 
-        if (evt.nativeEvent.changedTouches.length === 1 && moveDistance < (this.props.clickDistance || 0)) {
+        const isSingleFingerClick = this.maxContactPoints === 1;
+        if (isSingleFingerClick && moveDistance < (this.props.clickDistance || 0)) {
           this.singleClickTimeout = setTimeout(() => {
             if (this.props.onClick) {
               this.props.onClick({ locationX, locationY, pageX, pageY });
@@ -425,6 +434,7 @@ export default class ImageViewer extends React.Component<Props, State> {
 
           this.panResponderReleaseResolve();
         }
+        this.maxContactPoints = 0;
       },
       onPanResponderTerminate: () => {
         //
