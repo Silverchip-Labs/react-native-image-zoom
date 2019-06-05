@@ -419,7 +419,7 @@ export default class ImageViewer extends React.Component<Props, State> {
         const moveDistance = Math.sqrt(gestureState.dx * gestureState.dx + gestureState.dy * gestureState.dy);
         const { locationX, locationY, pageX, pageY } = evt.nativeEvent;
 
-        const isSingleFingerClick = this.maxContactPoints === 1;
+        const isSingleFingerClick = this.maxContactPoints <= 1;
         if (isSingleFingerClick && moveDistance < (this.props.clickDistance || 0)) {
           this.singleClickTimeout = setTimeout(() => {
             if (this.props.onClick) {
