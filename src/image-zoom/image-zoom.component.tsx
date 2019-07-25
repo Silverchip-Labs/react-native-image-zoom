@@ -169,8 +169,6 @@ export default class ImageViewer extends React.Component<Props, State> {
                 this.positionY = ((this.props.cropHeight / 2 - this.doubleClickY) * diffScale) / this.scale;
               }
 
-              this.imageDidMove('centerOn');
-
               Animated.parallel([
                 Animated.timing(this.animatedScale, {
                   toValue: this.scale,
@@ -184,7 +182,7 @@ export default class ImageViewer extends React.Component<Props, State> {
                   toValue: this.positionY,
                   duration: 100
                 })
-              ]).start();
+              ]).start(() => this.imageDidMove('centerOn'));
             }
           } else {
             this.lastClickTime = new Date().getTime();
@@ -464,66 +462,39 @@ export default class ImageViewer extends React.Component<Props, State> {
     if (this.props.enableCenterFocus && this.scale < 1) {
       // 如果缩放小于1，强制重置为 1
       this.scale = 1;
-      Animated.timing(this.animatedScale, {
-        toValue: this.scale,
-        duration: 1
-      }).start();
+      this.animatedScale.setValue(this.scale);
     } else if (this.scale < (this.props.minScale || 0)) {
       // If the current scale is zoomed out too much, bounce back to the minScale
-      this.positionX = this.lastValidPositionX;
       this.scale = this.props.minScale || 0;
-      Animated.timing(this.animatedPositionX, {
-        toValue: this.positionX,
-        duration: 1
-      }).start();
+      this.animatedScale.setValue(this.scale);
+
+      this.positionX = this.lastValidPositionX;
+      this.animatedPositionX.setValue(this.positionX);
 
       this.positionY = this.lastValidPositionY;
-      Animated.timing(this.animatedPositionY, {
-        toValue: this.positionY,
-        duration: 1
-      }).start();
-
-      Animated.timing(this.animatedScale, {
-        toValue: this.scale,
-        duration: 1
-      }).start();
+      this.animatedPositionY.setValue(this.positionY);
     } else if (this.scale > (this.props.maxScale || 0)) {
       // If the current scale is zoomed in too much, bounce back to the maxScale
-      this.positionX = this.lastValidPositionX;
       this.scale = this.props.maxScale || 0;
-      Animated.timing(this.animatedPositionX, {
-        toValue: this.positionX,
-        duration: 1
-      }).start();
+      this.animatedScale.setValue(this.scale);
+
+      this.positionX = this.lastValidPositionX;
+      this.animatedPositionX.setValue(this.positionX);
 
       this.positionY = this.lastValidPositionY;
-      Animated.timing(this.animatedPositionY, {
-        toValue: this.positionY,
-        duration: 1
-      }).start();
-
-      Animated.timing(this.animatedScale, {
-        toValue: this.scale,
-        duration: 1
-      }).start();
+      this.animatedPositionY.setValue(this.positionY);
     }
 
     if (this.props.imageWidth * this.scale <= this.props.cropWidth) {
       // 如果图片宽度小于盒子宽度，横向位置重置
       this.positionX = 0;
-      Animated.timing(this.animatedPositionX, {
-        toValue: this.positionX,
-        duration: 1
-      }).start();
+      this.animatedPositionX.setValue(this.positionX);
     }
 
     if (this.props.imageHeight * this.scale <= this.props.cropHeight) {
       // 如果图片高度小于盒子高度，纵向位置重置
       this.positionY = 0;
-      Animated.timing(this.animatedPositionY, {
-        toValue: this.positionY,
-        duration: 1
-      }).start();
+      this.animatedPositionY.setValue(this.positionY);
     }
 
     // 横向肯定不会超出范围，由拖拽时控制
@@ -536,10 +507,7 @@ export default class ImageViewer extends React.Component<Props, State> {
       } else if (this.positionY > verticalMax) {
         this.positionY = verticalMax;
       }
-      Animated.timing(this.animatedPositionY, {
-        toValue: this.positionY,
-        duration: 1
-      }).start();
+      this.animatedPositionY.setValue(this.positionY);
     }
 
     if (this.props.imageWidth * this.scale > this.props.cropWidth) {
@@ -550,24 +518,16 @@ export default class ImageViewer extends React.Component<Props, State> {
       } else if (this.positionX > horizontalMax) {
         this.positionX = horizontalMax;
       }
-      Animated.timing(this.animatedPositionX, {
-        toValue: this.positionX,
-        duration: 1
-      }).start();
+      this.animatedPositionX.setValue(this.positionX);
     }
 
     // 拖拽正常结束后,如果没有缩放,直接回到0,0点
     if (this.props.enableCenterFocus && this.scale === 1) {
       this.positionX = 0;
       this.positionY = 0;
-      Animated.timing(this.animatedPositionX, {
-        toValue: this.positionX,
-        duration: 1
-      }).start();
-      Animated.timing(this.animatedPositionY, {
-        toValue: this.positionY,
-        duration: 1
-      }).start();
+
+      this.animatedPositionX.setValue(this.positionX);
+      this.animatedPositionY.setValue(this.positionY);
     }
 
     // 水平溢出量置空
@@ -618,7 +578,7 @@ export default class ImageViewer extends React.Component<Props, State> {
     this.positionX = params!.x;
     this.positionY = params!.y;
     this.scale = params!.scale;
-    const duration = params!.duration || 300;
+    const duration = params!.duration || 100;
     Animated.parallel([
       Animated.timing(this.animatedScale, {
         toValue: this.scale,
