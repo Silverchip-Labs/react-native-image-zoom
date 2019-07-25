@@ -1,6 +1,6 @@
 {
   "name": "react-native-image-pan-zoom",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "react native image pan zoom",
   "main": "built/index.js",
   "types": "built/index.d.ts",
@@ -31,5 +31,8 @@
     "tslint": "^5.8.0",
     "tslint-config-prettier": "^1.13.0",
     "typescript": "^2.9.2"
-  }
+  },
+  "files": [
+    "build"
+  ]
 }
