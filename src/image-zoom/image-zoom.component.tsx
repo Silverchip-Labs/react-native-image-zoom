@@ -16,6 +16,8 @@ export default class ImageViewer extends React.Component<Props, State> {
   public static defaultProps = new Props();
   public state = new State();
 
+  private delay = 10;
+  private lastMoved = Date.now();
   // 上次/当前/动画 x 位移
   private lastPositionX: number | null = null;
   private positionX = 0;
@@ -190,6 +192,14 @@ export default class ImageViewer extends React.Component<Props, State> {
         }
       },
       onPanResponderMove: (evt, gestureState) => {
+        // throttle the requests to every 10ms
+        const time = Date.now();
+        const delta = time - this.lastMoved;
+        if (delta < this.delay) {
+          return;
+        }
+        this.lastMoved = time;
+
         const contactPointsCount = evt.nativeEvent.touches.length;
         if (contactPointsCount > this.maxContactPoints) {
           this.maxContactPoints = contactPointsCount;
