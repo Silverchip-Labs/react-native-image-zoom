@@ -1,0 +1,6 @@
+examples/
+node_modules/
+src/
+.prettierrc
+readme.md
+tslint.json
