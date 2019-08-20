@@ -37,7 +37,12 @@ export default class ImageViewer extends React.Component<Props, State> {
     private lastValidPositionX;
     private lastValidPositionY;
     private maxContactPoints;
+    private isInitialPinch;
     componentWillMount(): void;
+    _getOffsetAdjustedPosition(x: number, y: number): {
+        x: number;
+        y: number;
+    };
     resetScale: () => void;
     panResponderReleaseResolve: () => void;
     componentDidMount(): void;

@@ -85,6 +85,8 @@ export default class ImageViewer extends React.Component<Props, State> {
   // Keeps max number of contact point in 1 gesture
   private maxContactPoints = 0;
 
+  private isInitialPinch = true;
+
   public componentWillMount() {
     this.imagePanResponder = PanResponder.create({
       // 要求成为响应者：
@@ -328,33 +330,27 @@ export default class ImageViewer extends React.Component<Props, State> {
           }
 
           if (this.props.pinchToZoom) {
-            var midpointX =
-              (evt.nativeEvent.changedTouches[0].locationX + evt.nativeEvent.changedTouches[1].locationX) / 2;
-            var midpointY =
-              (evt.nativeEvent.changedTouches[0].locationY + evt.nativeEvent.changedTouches[1].locationY) / 2;
-
-            this.midpointX = midpointX;
-            this.midpointY = midpointY;
-
+            const finger1Touch = evt.nativeEvent.changedTouches[0];
+            const finger2Touch = evt.nativeEvent.changedTouches[1];
             // 找最小的 x 和最大的 x
             let minX: number;
             let maxX: number;
-            if (evt.nativeEvent.changedTouches[0].locationX > evt.nativeEvent.changedTouches[1].locationX) {
-              minX = evt.nativeEvent.changedTouches[1].pageX;
-              maxX = evt.nativeEvent.changedTouches[0].pageX;
+            if (finger1Touch.locationX > finger2Touch.locationX) {
+              minX = finger2Touch.pageX;
+              maxX = finger1Touch.pageX;
             } else {
-              minX = evt.nativeEvent.changedTouches[0].pageX;
-              maxX = evt.nativeEvent.changedTouches[1].pageX;
+              minX = finger1Touch.pageX;
+              maxX = finger2Touch.pageX;
             }
 
             let minY: number;
             let maxY: number;
-            if (evt.nativeEvent.changedTouches[0].locationY > evt.nativeEvent.changedTouches[1].locationY) {
-              minY = evt.nativeEvent.changedTouches[1].pageY;
-              maxY = evt.nativeEvent.changedTouches[0].pageY;
+            if (finger1Touch.locationY > finger2Touch.locationY) {
+              minY = finger2Touch.pageY;
+              maxY = finger1Touch.pageY;
             } else {
-              minY = evt.nativeEvent.changedTouches[0].pageY;
-              maxY = evt.nativeEvent.changedTouches[1].pageY;
+              minY = finger1Touch.pageY;
+              maxY = finger2Touch.pageY;
             }
 
             let widthDistance = maxX - minX;
@@ -366,6 +362,13 @@ export default class ImageViewer extends React.Component<Props, State> {
             var diagonalDistance = Math.sqrt(widthDistance * widthDistance + heightDistance * heightDistance);
 
             this.zoomCurrentDistance = Number(diagonalDistance.toFixed(1));
+
+            // if it is the initial pinch or zooming out
+            if (this.isInitialPinch || this.zoomCurrentDistance < (this.zoomLastDistance || 0)) {
+              this.midpointX = (finger1Touch.locationX + finger2Touch.locationX) / 2;
+              this.midpointY = (finger1Touch.locationY + finger2Touch.locationY) / 2;
+            }
+
             if (this.zoomLastDistance !== null) {
               var distanceScale = this.zoomCurrentDistance / this.zoomLastDistance;
 
@@ -388,6 +391,12 @@ export default class ImageViewer extends React.Component<Props, State> {
               var scaleOffsetXDifference = scaleOffsetX - offsetX;
               var scaleOffsetYDifference = scaleOffsetY - offsetY;
 
+              // slow down the panning when the zoom scale gets large so it doesn't go crazy
+              if (this.scale > 3.5) {
+                scaleOffsetXDifference /= this.scale;
+                scaleOffsetYDifference /= this.scale;
+              }
+
               this.positionX -= scaleOffsetXDifference;
               this.positionY -= scaleOffsetYDifference;
 
@@ -399,7 +408,7 @@ export default class ImageViewer extends React.Component<Props, State> {
               this.lastValidPositionX = this.positionX;
               this.lastValidPositionY = this.positionY;
             }
-
+            this.isInitialPinch = false;
             this.zoomLastDistance = this.zoomCurrentDistance;
           }
         }
@@ -407,6 +416,7 @@ export default class ImageViewer extends React.Component<Props, State> {
         this.imageDidMove('onPanResponderMove');
       },
       onPanResponderRelease: (evt, gestureState) => {
+        this.isInitialPinch = true;
         // 取消长按
         if (this.longPressTimeout) {
           clearTimeout(this.longPressTimeout);
@@ -448,6 +458,20 @@ export default class ImageViewer extends React.Component<Props, State> {
         //
       }
     });
+  }
+
+  public  _getOffsetAdjustedPosition(x: number, y: number) {
+    const { imageHeight = 0, imageWidth = 0 } = this.props;
+
+    const currentElementWidth = imageWidth;
+    const currentElementHeight = imageHeight;
+
+    const returnObj = {
+      x: (-x + (currentElementWidth / 2)),
+      y: (-y + (currentElementHeight / 2)),
+    };
+
+    return returnObj;
   }
 
   public resetScale = () => {

@@ -22,6 +22,7 @@ export interface IOnClick {
   pageY: number
 }
 
+
 export class Props {
   /**
    * 操作区域宽度

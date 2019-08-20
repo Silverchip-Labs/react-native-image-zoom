@@ -73,6 +73,7 @@ var ImageViewer = /** @class */ (function (_super) {
         _this.lastValidPositionY = 0;
         // Keeps max number of contact point in 1 gesture
         _this.maxContactPoints = 0;
+        _this.isInitialPinch = true;
         _this.resetScale = function () {
             _this.positionX = 0;
             _this.positionY = 0;
@@ -388,30 +389,28 @@ var ImageViewer = /** @class */ (function (_super) {
                         clearTimeout(_this.longPressTimeout);
                     }
                     if (_this.props.pinchToZoom) {
-                        var midpointX = (evt.nativeEvent.changedTouches[0].locationX + evt.nativeEvent.changedTouches[1].locationX) / 2;
-                        var midpointY = (evt.nativeEvent.changedTouches[0].locationY + evt.nativeEvent.changedTouches[1].locationY) / 2;
-                        _this.midpointX = midpointX;
-                        _this.midpointY = midpointY;
+                        var finger1Touch = evt.nativeEvent.changedTouches[0];
+                        var finger2Touch = evt.nativeEvent.changedTouches[1];
                         // 找最小的 x 和最大的 x
                         var minX = void 0;
                         var maxX = void 0;
-                        if (evt.nativeEvent.changedTouches[0].locationX > evt.nativeEvent.changedTouches[1].locationX) {
-                            minX = evt.nativeEvent.changedTouches[1].pageX;
-                            maxX = evt.nativeEvent.changedTouches[0].pageX;
+                        if (finger1Touch.locationX > finger2Touch.locationX) {
+                            minX = finger2Touch.pageX;
+                            maxX = finger1Touch.pageX;
                         }
                         else {
-                            minX = evt.nativeEvent.changedTouches[0].pageX;
-                            maxX = evt.nativeEvent.changedTouches[1].pageX;
+                            minX = finger1Touch.pageX;
+                            maxX = finger2Touch.pageX;
                         }
                         var minY = void 0;
                         var maxY = void 0;
-                        if (evt.nativeEvent.changedTouches[0].locationY > evt.nativeEvent.changedTouches[1].locationY) {
-                            minY = evt.nativeEvent.changedTouches[1].pageY;
-                            maxY = evt.nativeEvent.changedTouches[0].pageY;
+                        if (finger1Touch.locationY > finger2Touch.locationY) {
+                            minY = finger2Touch.pageY;
+                            maxY = finger1Touch.pageY;
                         }
                         else {
-                            minY = evt.nativeEvent.changedTouches[0].pageY;
-                            maxY = evt.nativeEvent.changedTouches[1].pageY;
+                            minY = finger1Touch.pageY;
+                            maxY = finger2Touch.pageY;
                         }
                         var widthDistance = maxX - minX;
                         var heightDistance = maxY - minY;
@@ -419,6 +418,11 @@ var ImageViewer = /** @class */ (function (_super) {
                         var mapCentreY = _this.props.imageHeight / 2 - _this.positionY; // This is image coords
                         var diagonalDistance = Math.sqrt(widthDistance * widthDistance + heightDistance * heightDistance);
                         _this.zoomCurrentDistance = Number(diagonalDistance.toFixed(1));
+                        // if it is the initial pinch or zooming out
+                        if (_this.isInitialPinch || _this.zoomCurrentDistance < (_this.zoomLastDistance || 0)) {
+                            _this.midpointX = (finger1Touch.locationX + finger2Touch.locationX) / 2;
+                            _this.midpointY = (finger1Touch.locationY + finger2Touch.locationY) / 2;
+                        }
                         if (_this.zoomLastDistance !== null) {
                             var distanceScale = _this.zoomCurrentDistance / _this.zoomLastDistance;
                             // -- Zooming
@@ -435,6 +439,11 @@ var ImageViewer = /** @class */ (function (_super) {
                             var scaleOffsetY = offsetY * distanceScale;
                             var scaleOffsetXDifference = scaleOffsetX - offsetX;
                             var scaleOffsetYDifference = scaleOffsetY - offsetY;
+                            // slow down the panning when the zoom scale gets large so it doesn't go crazy
+                            if (_this.scale > 3.5) {
+                                scaleOffsetXDifference /= _this.scale;
+                                scaleOffsetYDifference /= _this.scale;
+                            }
                             _this.positionX -= scaleOffsetXDifference;
                             _this.positionY -= scaleOffsetYDifference;
                             _this.animatedPositionX.setValue(_this.positionX);
@@ -444,12 +453,14 @@ var ImageViewer = /** @class */ (function (_super) {
                             _this.lastValidPositionX = _this.positionX;
                             _this.lastValidPositionY = _this.positionY;
                         }
+                        _this.isInitialPinch = false;
                         _this.zoomLastDistance = _this.zoomCurrentDistance;
                     }
                 }
                 _this.imageDidMove('onPanResponderMove');
             },
             onPanResponderRelease: function (evt, gestureState) {
+                _this.isInitialPinch = true;
                 // 取消长按
                 if (_this.longPressTimeout) {
                     clearTimeout(_this.longPressTimeout);
@@ -487,6 +498,16 @@ var ImageViewer = /** @class */ (function (_super) {
                 //
             }
         });
+    };
+    ImageViewer.prototype._getOffsetAdjustedPosition = function (x, y) {
+        var _a = this.props, _b = _a.imageHeight, imageHeight = _b === void 0 ? 0 : _b, _c = _a.imageWidth, imageWidth = _c === void 0 ? 0 : _c;
+        var currentElementWidth = imageWidth;
+        var currentElementHeight = imageHeight;
+        var returnObj = {
+            x: (-x + (currentElementWidth / 2)),
+            y: (-y + (currentElementHeight / 2)),
+        };
+        return returnObj;
     };
     ImageViewer.prototype.componentDidMount = function () {
         if (this.props.centerOn) {
