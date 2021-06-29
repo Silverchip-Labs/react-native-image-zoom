@@ -593,7 +593,7 @@ var ImageViewer = /** @class */ (function (_super) {
         };
         var parentStyles = react_native_1.StyleSheet.flatten(this.props.style);
         return (<react_native_1.View style={__assign({}, image_zoom_style_1.default.container, parentStyles, { width: this.props.cropWidth, height: this.props.cropHeight })} {...this.imagePanResponder.panHandlers}>
-        <react_native_1.Animated.View style={animateConf} renderToHardwareTextureAndroid>
+        <react_native_1.Animated.View style={animateConf} renderToHardwareTextureAndroid={false}>
           <react_native_1.View onLayout={this.handleLayout.bind(this)} style={{
             width: this.props.imageWidth,
             height: this.props.imageHeight
